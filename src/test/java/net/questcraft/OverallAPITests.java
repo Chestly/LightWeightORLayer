@@ -11,7 +11,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class OverallAPITests {
-    final ORSetup.DBInformation information = TestingManagerUtils.testingDatabaseEnvironment();;
+    final ORSetup.DBInformation information = TestingManagerUtils.testingDatabaseEnvironment();
+    ;
     final ORLayerUtils util = ORSetup.configureORLayerUtils(information);
 
 
@@ -40,12 +41,9 @@ public class OverallAPITests {
                 new StructuredTestTable3(20L, "Testing something", 10,
                         new ArrayList<StructuredTestTable4>() {{
                             add(new StructuredTestTable4(17L, "20", "randomValueThing"));
-
                         }}, new ArrayList<StructuredTestTable5>() {{
                     add(new StructuredTestTable5(24L, 20, "testAgain"));
-
                 }}));
-
         util.update(test);
     }
 
