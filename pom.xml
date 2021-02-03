@@ -6,7 +6,7 @@
 
     <groupId>net.questcraft</groupId>
     <artifactId>LightWeightORLayer</artifactId>
-    <version>1.5.2</version>
+    <version>1.5.1</version>
     <build>
         <plugins>
             <plugin>

@@ -15,11 +15,4 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface SQLPrimaryIndex {
-//    /**
-//     * The optional Column name for the given Index. If value is not provided
-//     * The index will default to the name of the field.
-//     *
-//     * @return The column name value
-//     */
-//    String value() default "";
 }
