@@ -126,7 +126,6 @@ The name of the table you are creating should match with the file name
 Next you need to create the table with the DBUtils
 
 ```java
-
 //Variable `orLayerDBUtils` defined above
 orLayerDBUtils.createTable("FILE_NAME"); //Can be a .sql file, but .txt works etc...
 
@@ -136,24 +135,129 @@ orLayerDBUtils.createTable("FILE_NAME", "FILE_LOCATION");
 
 ## Data Structures
 
-LightWeightORLayer has a very heavy annotation based API. Here is how each data bean should look and how it should represent its corresponding table
+LightWeightORLayer has a very heavy annotation based API. Here is how each data bean should look with annotations and how it should represent its corresponding table.
 
-**Required**
+### Required
 1) Every Class should be annotated with `@SQLNode` this will tell the API what table it represents and that it is a node.
 2) Every class should have a member variable annotated with `@SQLPrimaryIndex`. This will tell the API what is the primary key for this column
 
-**One-To-Many**
+3) Every bean needs a non-paremeterized constructor.
+
+### One To Many
 1) All One-To-Many relationship chlidren need to be marked with `@OneToManyRelationshipChild`
-2) All columns holding one to many relation ships(Collection) must be marked with `@SQLOneToMany`
+2) All columns holding one to many relation ships(Collection) must be marked with `@SQLOneToMany`, This takes a class which will tell the ORlayer what to iterate.
 3) All One-To-Many relationship chlidren need to have a member variable(and a corresponding SQL Column) marked with `@SQLChildRelationalColumn`. This will be the value that identifies it to its parent(This value corresponds to the parents ID(only tested with integers))
 
-**Extra**
+### Extra
 1) To ignore a member variable you can mark it with `@SQLIgnore`. Additionally all `transient` or `static` fields will be ignored.
 2) To mark a member variable as having a different column name in SQL as in Java it can be marked with `@SQLColumnName` and provide the column name in SQL.
 
 For a full example please see the end of this document.
 
-More Documentation coming soon
+## Relationships
+
+We can support the following relationships:
+- [One to many](#one-to-many)
+- [One to One](#required)
+- Many to one : By user
+
+## Whole system example
+
+First we create our beans.
+
+**Note:** This is the setup we used in testing so if you want to see it as a project you can go to `src/test/java/net/questcraft/structuretests`
+
+One:
+```java
+@SQLNode("testTable1")
+public class StructuredTestTable1 {
+
+    @SQLColumnName("id") @SQLPrimaryIndex() private Long primary;
+    @SQLColumnName("title") private Integer secondary;
+
+    public StructuredTestTable1(Long primary, Integer secondary) {
+        this.primary = primary;
+        this.secondary = secondary;
+    }
+
+    public StructuredTestTable1() {
+    }
+}
+```
+
+Two:
+```java
+@SQLNode("testTable2")
+public class StructuredTestTable2 {
+    @SQLPrimaryIndex private String username;
+    private String password;
+    @SQLColumnName("postID") private StructuredTestTable1 cardPost; //One to one
+    private StructuredTestTable3 profilePic;
+
+
+    public StructuredTestTable2(String username, String password, StructuredTestTable1 cardPost, StructuredTestTable3 profilePic) {
+        this.username = username;
+        this.password = password;
+        this.cardPost = cardPost;
+        this.profilePic = profilePic;
+    }
+
+    public StructuredTestTable2() {
+    }
+}
+```
+
+Three:
+```java
+@SQLNode("testTable3")
+public class StructuredTestTable3 {
+    @SQLPrimaryIndex
+    private Long id;
+    private String image;
+    private Integer identifier;
+    @SQLOneToMany(StructuredTestTable4.class)
+    private List<StructuredTestTable4> friends; //One to many
+    @SQLOneToMany(StructuredTestTable5.class)
+    private List<StructuredTestTable5> blocks; //One to many
+
+    public StructuredTestTable3(Long id, String image, Integer identifier, List<StructuredTestTable4> friends, List<StructuredTestTable5> blocks) {
+        this.id = id;
+        this.image = image;
+        this.identifier = identifier;
+        this.friends = friends;
+        this.blocks = blocks;
+    }
+
+    public StructuredTestTable3() {
+    }
+}
+```
+Four:
+```java
+@SQLNode("testTable4")
+@OneToManyRelationshipChild //Marked as a one to many child, a node cannot be a one to many child and a one to one child
+                            // Instead there should be two seperate tables for identical children.
+public class StructuredTestTable4 {
+    @SQLPrimaryIndex
+    private Long id;
+    @SQLChildRelationalColumn
+    private String value;
+    @SQLColumnName("third")
+    private String three;
+
+    public StructuredTestTable4(Long id, String value, String three) {
+        this.id = id;
+        this.value = value;
+        this.three = three;
+    }
+
+    public StructuredTestTable4() {
+    }
+}
+```
+Five:
+
+
 
 
 
